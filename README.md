@@ -81,9 +81,9 @@ Intent中必须含有data数据，并且data数据能够完全匹配过滤规则
         }
    ```
 
-- 假如我们从浏览器打开了应用，按下HOME键，然后又从桌面点击了应用图标，这时候会发生什么？
-- 假如应用之前已经打开了某个页面，然后我们又从浏览器重新打开了应用，这时候按返回键，我们还能回到之前打开的页面么？
-- 我们通过浏览器打开页面一般都会是二级甚至三级页面，如果之前没有打开过应用，那么直接按返回键就会退出应用，这似乎用户体验不太友好，怎么解决？
+1. 假如我们从浏览器打开了应用，按下HOME键，然后又从桌面点击了应用图标，这时候会发生什么？
+2. 假如应用之前已经打开了某个页面，然后我们又从浏览器重新打开了应用，这时候按返回键，我们还能回到之前打开的页面么？
+3. 我们通过浏览器打开页面一般都会是二级甚至三级页面，如果之前没有打开过应用，那么直接按返回键就会退出应用，这似乎用户体验不太友好，怎么解决？
 
 如果从应用A启动应用B的某个Activity C，则C会运行在A的任务栈中。从桌面启动的应用运行在应用本身的任务栈中，而从浏览器打开的界面则运行在浏览器的任务栈中，两个任务栈是分开的，所以在情景一，会重新创建出新的任务栈来打开应用，而在情景二中，由于浏览器的后台任务栈是桌面，在浏览器的任务栈中按返回键当然不能回到本地应用的任务栈咯而是回到桌面。
 
@@ -92,3 +92,39 @@ Intent中必须含有data数据，并且data数据能够完全匹配过滤规则
 `android:allowTaskReparenting="true"`
 
 设置了该属性的Activity在应用真正启动时，会将在其他任务栈中移动到自己的任务栈中来，由于移动过来的界面处与栈顶，所以会直接显示之前在浏览器中打开的界面.
+
+
+对于第二个问题，可以通过浏览器打开启动页，然后在启动页通过 NEW_TASK 的方式去启动目标页面，只需要在启动页面的OnCreate方法中根据Intent的类型做页面跳转即可。
+
+```java
+Intent intent = getIntent();
+if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+  Intent intent1 = new Intent();
+  intent1.setClass(this, MainActivity.class);
+  intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+  startActivity(intent1);
+  finish();
+} else if (Intent.ACTION_MAIN.equals(intent.getAction())) {
+  Intent intent1 = new Intent();
+  intent1.setClass(this, MainActivity.class);
+  startActivity(intent1);
+  finish();
+}
+```
+
+第三个问题，通过判断Activity的数量决定是否是直接唤起页面还是先唤起主界面再打开需要打开的界面使得按返回键不至于直接从二级或者三级界面退出应用。
+
+```java
+if (intent != null && Intent.ACTION_VIEW.equals(intent.getAction())) {
+  int activitySize = AppManager.getAppManager().getSize();
+  if (activitySize > 1) {
+    jumpFromBrowser(intent.getData());
+  } else {
+    intent.setClass(this, MainActivity.class);
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    startActivity(intent);
+  }
+  finish();
+  return;
+}
+```
