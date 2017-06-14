@@ -15,6 +15,16 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="main"
+                    android:scheme="mmga" />
+            </intent-filter>
         </activity>
 
         <activity android:name=".ActivityOne">
@@ -25,8 +35,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="mmga"
-                    android:host="www.baidu.com" />
+                    android:host="activity1"
+                    android:scheme="mmga" />
             </intent-filter>
         </activity>
 
@@ -38,8 +48,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="mmga"
-                    android:host="mmga.github.io" />
+                    android:host="activity2"
+                    android:scheme="mmga" />
             </intent-filter>
         </activity>
 
