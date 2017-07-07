@@ -17,7 +17,7 @@
 
     <Button
         android:layout_width="wrap_content"
-        android:text="打开Activity One"
+        android:text="打开Activity Two"
         android:id="@+id/btn_2"
         android:layout_height="wrap_content" />
 
